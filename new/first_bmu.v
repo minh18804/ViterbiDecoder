@@ -12,7 +12,7 @@ module first_bmu(
 );
     reg [1:0] count;
 
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk or posedge rst or renew) begin
         if (rst || renew) begin
             branch_metric_0 <= 2'b00;
             branch_metric_1 <= 2'b00;
@@ -65,7 +65,7 @@ module second_bmu(
 );
     reg [1:0] count;
 
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk or posedge rst or renew) begin
         if (rst || renew) begin
             branch_metric_00 <= 3'b000;
             branch_metric_01 <= 3'b000;

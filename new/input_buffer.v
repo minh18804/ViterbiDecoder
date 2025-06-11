@@ -16,24 +16,24 @@ module input_buffer(
     output reg [1:0] bit_pair_7
 );
 
-// 2-entry FIFO and control signals
+// 2 ngăn FIFO và các tín hiệu điều khiển
 reg [15:0] data_reg [1:0];    // 2 ngăn FIFO
 reg decoding;                  // Đánh dấu đang trong quá trình giải mã
-reg [15:0] decoding_data;      // Dữ liệu đang xử lý
+reg [15:0] decoding_data;      // Dữ liệu đưa ra đầu ra
 reg has_new_data;             // Đánh dấu có dữ liệu mới
-reg [15:0] prev_data;         // Lưu giá trị data_in trước đó
+reg [15:0] prev_data;         // Lưu giá trị data_in trước đó để so sánh với data_in hiện tại
 
 // Kiểm tra dữ liệu vào
 always @(data_in or posedge rst) begin
     if (rst) begin
-        has_new_data <= 1'b0;
+        has_new_data <= 1'b0; //Xử lý khi reset
     end
     else begin
         if (data_in != 16'b0) begin
-            has_new_data <= 1'b1;
+            has_new_data <= 1'b1;       //Nếu dữ liệu đầu vào khác 0 thì đẩy cờ has_new_data lên 1
         end
         else begin
-            has_new_data <= 1'b0;
+            has_new_data <= 1'b0;       //Nếu dữ liệu đầu vào bằng 0 thì đẩy cờ has_new_data xuống 0
         end
     end
 end
@@ -52,9 +52,9 @@ always @(posedge clk or posedge rst) begin
             // Khi hoàn thành giải mã một gói
             if (data_reg[1] != 16'b0) begin
                 // Nếu có dữ liệu trong ngăn 1, chuyển sang xử lý
-                decoding_data <= data_reg[1];
-                data_reg[1] <= data_reg[0];  // Dịch dữ liệu
-                data_reg[0] <= 16'b0;        // Xóa ngăn 0
+                decoding_data <= data_reg[0];
+                data_reg[0] <= data_reg[1];  // Dịch dữ liệu
+                data_reg[1] <= 16'b0;        // Xóa ngăn 0
                 decoding <= 1'b1;
             end
             else if (data_reg[0] != 16'b0) begin
@@ -82,7 +82,7 @@ always @(posedge clk or posedge rst) begin
             end
             else if (data_reg[1] == 16'b0) begin
                 // Lưu vào ngăn 1 nếu trống
-                prev_data <= data_in;
+                prev_data <= data_in;   
                 if (data_reg[0] != prev_data) begin
                     data_reg[1] <= data_in;
                 end

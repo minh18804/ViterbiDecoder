@@ -38,10 +38,12 @@ module selector(
         if (rst) begin
             out <= 8'b00000000;
             renew <= 1'b0;
-        end
-        else if (valid_in) begin
-            out <= selected_path;
-            renew <= ~renew;  // Toggle renew signal when output is ready
+        end else begin
+            renew <= 1'b0;  // Default: renew is 0
+            if (valid_in && selected_path != out) begin
+                out <= selected_path;
+                renew <= 1'b1;  // Generate a single-cycle pulse when output changes
+            end
         end
     end
 endmodule
