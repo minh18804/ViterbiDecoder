@@ -1,3 +1,6 @@
+`ifndef FIRST_BMU_V
+`define FIRST_BMU_V
+
 module first_bmu(
     input wire [1:0] bit_pair_0, //cặp bit thứ nhất của input, 
     input wire clk,
@@ -6,15 +9,16 @@ module first_bmu(
     output reg [1:0] branch_metric_1, //khoảng cách Hamming của bit_pair_0 với 11, chuyển sang trạng thái 01 ứng với đầu ra 1
     output reg valid_out
 );
+    reg [1:0] count;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             branch_metric_0 <= 2'b00;
             branch_metric_1 <= 2'b00;
             valid_out <= 1'b0;
+            count <= 2'd0;
         end
         else begin
-            valid_out <= 1'b1;  // Data will be valid in next clock
             case ({bit_pair_0[1], bit_pair_0[0]})
                 2'b00: begin
                     branch_metric_0 <= 2'd0;
@@ -33,6 +37,13 @@ module first_bmu(
                     branch_metric_1 <= 2'd0;
                 end
             endcase
+            
+            if (count == 2'd1) begin
+                valid_out <= 1'b1;
+            end
+            else if (!valid_out) begin
+                count <= count + 1'b1;
+            end
         end
     end
 endmodule
@@ -50,6 +61,7 @@ module second_bmu(
     output reg [2:0] branch_metric_11,  //khoảng cách Hamming của bit_pair_1 với 01, chuyển sang trạng thái 11 ứng với đầu ra 1
     output reg valid_out
 );
+    reg [1:0] count;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -58,9 +70,9 @@ module second_bmu(
             branch_metric_10 <= 3'b000;
             branch_metric_11 <= 3'b000;
             valid_out <= 1'b0;
+            count <= 2'd0;
         end
-        else if (valid_in) begin  // Only process when input is valid
-            valid_out <= 1'b1;  // Data will be valid in next clock
+        else if (valid_in) begin
             case ({bit_pair_1[1], bit_pair_1[0]})
                 2'b00: begin
                     branch_metric_00 <= 3'd0 + branch_metric_0;
@@ -87,9 +99,17 @@ module second_bmu(
                     branch_metric_11 <= 3'd1 + branch_metric_1;
                 end
             endcase
+
+            if (count == 2'd1) begin
+                valid_out <= 1'b1;
+            end
+            else if (!valid_out) begin
+                count <= count + 1'b1;
+            end
         end
         else begin
-            valid_out <= 1'b0;  // Output not valid if input not valid
+            valid_out <= 1'b0;
+            count <= 2'd0;
         end
     end
 endmodule
@@ -113,6 +133,7 @@ module bmu(
     output reg [3:0] branch_metric_111,
     output reg valid_out
 );
+    reg [1:0] count;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -125,9 +146,9 @@ module bmu(
             branch_metric_110 <= 4'b0000;
             branch_metric_111 <= 4'b0000;
             valid_out <= 1'b0;
+            count <= 2'd0;
         end
-        else if (valid_in) begin  // Only process when input is valid
-            valid_out <= 1'b1;  // Data will be valid in next clock
+        else if (valid_in) begin
             case ({bit_pair_input[1], bit_pair_input[0]})
                 2'b00: begin
                     branch_metric_000 <= 4'd0 + branch_metric_00;
@@ -170,9 +191,19 @@ module bmu(
                     branch_metric_111 <= 4'd1 + branch_metric_11;
                 end
             endcase
+
+            if (count == 2'd1) begin
+                valid_out <= 1'b1;
+            end
+            else if (!valid_out) begin
+                count <= count + 1'b1;
+            end
         end
         else begin
-            valid_out <= 1'b0;  // Output not valid if input not valid
+            valid_out <= 1'b0;
+            count <= 2'd0;
         end
     end
 endmodule
+
+`endif

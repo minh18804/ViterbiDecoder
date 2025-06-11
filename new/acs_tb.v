@@ -85,7 +85,7 @@ module acs_tb;
         forever #5 clk = ~clk;
     end
 
-    // Tasks for test setup and verification
+    // Test tasks
     task reset_system;
         begin
             rst = 1;
@@ -100,7 +100,7 @@ module acs_tb;
             {bm_00_0, bm_00_1, bm_01_0, bm_01_1} = {4'd0, 4'd0, 4'd0, 4'd0};
             {bm_10_0, bm_10_1, bm_11_0, bm_11_1} = {4'd0, 4'd0, 4'd0, 4'd0};
             {path_00, path_01, path_10, path_11} = {8'd0, 8'd0, 8'd0, 8'd0};
-            
+
             #20;
             rst = 0;
             #10;
@@ -113,28 +113,34 @@ module acs_tb;
             valid_in_first = 1;
             case(test_case)
                 4'd0: begin // Basic comparison test
-                    bm_000 = 4'd1; bm_100 = 4'd2;  // 000 should be selected
-                    bm_001 = 4'd3; bm_101 = 4'd1;  // 101 should be selected
-                    bm_010 = 4'd2; bm_110 = 4'd2;  // 010 should be selected (equal case)
-                    bm_011 = 4'd4; bm_111 = 4'd3;  // 111 should be selected
+                    bm_000 = 4'd1; bm_001 = 4'd3; // 000 should be selected
+                    bm_010 = 4'd2; bm_011 = 4'd4; // 010 should be selected
+                    bm_100 = 4'd2; bm_101 = 4'd1; // 101 should be selected
+                    bm_110 = 4'd2; bm_111 = 4'd3; // 110 should be selected
                 end
-                4'd1: begin // All equal metrics
-                    bm_000 = 4'd2; bm_100 = 4'd2;
-                    bm_001 = 4'd2; bm_101 = 4'd2;
-                    bm_010 = 4'd2; bm_110 = 4'd2;
-                    bm_011 = 4'd2; bm_111 = 4'd2;
+                4'd1: begin // Equal metrics test
+                    bm_000 = 4'd2; bm_001 = 4'd2;
+                    bm_010 = 4'd2; bm_011 = 4'd2;
+                    bm_100 = 4'd2; bm_101 = 4'd2;
+                    bm_110 = 4'd2; bm_111 = 4'd2;
                 end
-                4'd2: begin // Maximum difference
-                    bm_000 = 4'd0; bm_100 = 4'd15;
-                    bm_001 = 4'd15; bm_101 = 4'd0;
-                    bm_010 = 4'd0; bm_110 = 4'd15;
-                    bm_011 = 4'd15; bm_111 = 4'd0;
+                4'd2: begin // Maximum difference test
+                    bm_000 = 4'd0; bm_001 = 4'd15;
+                    bm_010 = 4'd15; bm_011 = 4'd0;
+                    bm_100 = 4'd0; bm_101 = 4'd15;
+                    bm_110 = 4'd15; bm_111 = 4'd0;
+                end
+                4'd3: begin // Alternating pattern test
+                    bm_000 = 4'd1; bm_001 = 4'd2;
+                    bm_010 = 4'd3; bm_011 = 4'd4;
+                    bm_100 = 4'd5; bm_101 = 4'd6;
+                    bm_110 = 4'd7; bm_111 = 4'd8;
                 end
                 default: begin
-                    bm_000 = 4'd0; bm_100 = 4'd0;
-                    bm_001 = 4'd0; bm_101 = 4'd0;
-                    bm_010 = 4'd0; bm_110 = 4'd0;
-                    bm_011 = 4'd0; bm_111 = 4'd0;
+                    bm_000 = 4'd0; bm_001 = 4'd0;
+                    bm_010 = 4'd0; bm_011 = 4'd0;
+                    bm_100 = 4'd0; bm_101 = 4'd0;
+                    bm_110 = 4'd0; bm_111 = 4'd0;
                 end
             endcase
             #10;
@@ -146,31 +152,41 @@ module acs_tb;
         begin
             valid_in_acs = 1;
             case(test_case)
-                4'd0: begin // Test path history concatenation
-                    bm_00_0 = 4'd1; bm_10_0 = 4'd2;
-                    bm_00_1 = 4'd2; bm_10_1 = 4'd1;
-                    bm_01_0 = 4'd3; bm_11_0 = 4'd2;
-                    bm_01_1 = 4'd1; bm_11_1 = 4'd4;
+                4'd0: begin // Basic path history test
+                    bm_00_0 = 4'd1; bm_00_1 = 4'd2;
+                    bm_01_0 = 4'd3; bm_01_1 = 4'd4;
+                    bm_10_0 = 4'd2; bm_10_1 = 4'd1;
+                    bm_11_0 = 4'd4; bm_11_1 = 4'd3;
                     path_00 = 8'b10101010;
                     path_01 = 8'b11001100;
                     path_10 = 8'b11110000;
                     path_11 = 8'b00001111;
                 end
-                4'd1: begin // Test with all zeros path history
-                    bm_00_0 = 4'd3; bm_10_0 = 4'd2;
-                    bm_00_1 = 4'd1; bm_10_1 = 4'd4;
-                    bm_01_0 = 4'd2; bm_11_0 = 4'd3;
-                    bm_01_1 = 4'd4; bm_11_1 = 4'd1;
+                4'd1: begin // All zeros path history
+                    bm_00_0 = 4'd2; bm_00_1 = 4'd3;
+                    bm_01_0 = 4'd1; bm_01_1 = 4'd4;
+                    bm_10_0 = 4'd3; bm_10_1 = 4'd2;
+                    bm_11_0 = 4'd4; bm_11_1 = 4'd1;
                     path_00 = 8'b00000000;
                     path_01 = 8'b00000000;
                     path_10 = 8'b00000000;
                     path_11 = 8'b00000000;
                 end
+                4'd2: begin // All ones path history
+                    bm_00_0 = 4'd1; bm_00_1 = 4'd4;
+                    bm_01_0 = 4'd4; bm_01_1 = 4'd1;
+                    bm_10_0 = 4'd2; bm_10_1 = 4'd3;
+                    bm_11_0 = 4'd3; bm_11_1 = 4'd2;
+                    path_00 = 8'b11111111;
+                    path_01 = 8'b11111111;
+                    path_10 = 8'b11111111;
+                    path_11 = 8'b11111111;
+                end
                 default: begin
-                    bm_00_0 = 4'd0; bm_10_0 = 4'd0;
-                    bm_00_1 = 4'd0; bm_10_1 = 4'd0;
-                    bm_01_0 = 4'd0; bm_11_0 = 4'd0;
-                    bm_01_1 = 4'd0; bm_11_1 = 4'd0;
+                    bm_00_0 = 4'd0; bm_00_1 = 4'd0;
+                    bm_01_0 = 4'd0; bm_01_1 = 4'd0;
+                    bm_10_0 = 4'd0; bm_10_1 = 4'd0;
+                    bm_11_0 = 4'd0; bm_11_1 = 4'd0;
                     path_00 = 8'd0;
                     path_01 = 8'd0;
                     path_10 = 8'd0;
@@ -195,11 +211,13 @@ module acs_tb;
         test_first_acs(4'd0);
         test_first_acs(4'd1);
         test_first_acs(4'd2);
+        test_first_acs(4'd3);
 
         // Test acs module
         $display("\nTesting acs module...");
         test_acs(4'd0);
         test_acs(4'd1);
+        test_acs(4'd2);
 
         // Test reset during operation
         $display("\nTesting reset during operation...");
@@ -214,8 +232,8 @@ module acs_tb;
         valid_in_first = 0;
         valid_in_acs = 0;
         #20;
-        valid_in_first = 1;
-        valid_in_acs = 1;
+        test_first_acs(4'd3);
+        test_acs(4'd2);
         #20;
 
         // End simulation

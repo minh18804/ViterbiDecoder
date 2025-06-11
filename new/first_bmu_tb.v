@@ -98,7 +98,7 @@ module bmu_full_tb();
         // Release rst
         rst = 0;
         #10;
-
+        
         // Test Case 1: All zeros
         bit_pair_0 = 2'b00;  // Will give bm0=0, bm1=2
         bit_pair_1 = 2'b00;

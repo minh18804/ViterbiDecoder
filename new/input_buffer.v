@@ -1,3 +1,6 @@
+`ifndef INPUT_BUFFER_V
+`define INPUT_BUFFER_V
+
 module input_buffer(
     input wire clk,
     input wire rst,
@@ -59,3 +62,5 @@ endmodule
 //         .input(input),
 //     );
 // endmodule
+
+`endif
