@@ -1,7 +1,7 @@
 `include "selector.v"
 `include "input_buffer.v"
 `include "first_bmu.v"
-`include "acs.v"
+`include "cs.v"
 
 module viterbi_decoder_top(
 	input wire clk,
@@ -98,7 +98,7 @@ module viterbi_decoder_top(
 	wire [3:0] branch_metric_111_8;
 	wire valid_out_eighth_bmu;
 
-//First_acs
+//First_cs	
 	wire [3:0] new_branch_metric_00_3;
 	wire [3:0] new_branch_metric_01_3;
 	wire [3:0] new_branch_metric_10_3;
@@ -107,10 +107,10 @@ module viterbi_decoder_top(
 	wire [7:0] selected_branch_at_01_3;
 	wire [7:0] selected_branch_at_10_3;
 	wire [7:0] selected_branch_at_11_3;
-	wire [2:0] write_pointer_out_first_acs;
-	wire valid_out_first_acs;
+	wire [2:0] write_pointer_out_first_cs;
+	wire valid_out_first_cs;
 
-//Second_acs
+//Second_cs
 	wire [3:0] new_branch_metric_00_4;
 	wire [3:0] new_branch_metric_01_4;
 	wire [3:0] new_branch_metric_10_4;
@@ -119,10 +119,10 @@ module viterbi_decoder_top(
 	wire [7:0] updated_selected_branch_at_01_4;
 	wire [7:0] updated_selected_branch_at_10_4;
 	wire [7:0] updated_selected_branch_at_11_4;
-	wire [2:0] write_pointer_out_second_acs;
-	wire valid_out_second_acs;
+	wire [2:0] write_pointer_out_second_cs;
+	wire valid_out_second_cs;
 
-//Third_acs
+//Third_cs
 	wire [3:0] new_branch_metric_00_5;
 	wire [3:0] new_branch_metric_01_5;
 	wire [3:0] new_branch_metric_10_5;
@@ -131,10 +131,10 @@ module viterbi_decoder_top(
 	wire [7:0] updated_selected_branch_at_01_5;
 	wire [7:0] updated_selected_branch_at_10_5;
 	wire [7:0] updated_selected_branch_at_11_5;
-	wire [2:0] write_pointer_out_third_acs;
-	wire valid_out_third_acs;
+	wire [2:0] write_pointer_out_third_cs;
+	wire valid_out_third_cs;
 
-//Fourth_acs
+//Fourth_cs
 	wire [3:0] new_branch_metric_00_6;
 	wire [3:0] new_branch_metric_01_6;
 	wire [3:0] new_branch_metric_10_6;
@@ -143,10 +143,10 @@ module viterbi_decoder_top(
 	wire [7:0] updated_selected_branch_at_01_6;
 	wire [7:0] updated_selected_branch_at_10_6;
 	wire [7:0] updated_selected_branch_at_11_6;
-	wire [2:0] write_pointer_out_fourth_acs;
-	wire valid_out_fourth_acs;
+	wire [2:0] write_pointer_out_fourth_cs;
+	wire valid_out_fourth_cs;
 
-//Fifth_acs
+//Fifth_cs
 	wire [3:0] new_branch_metric_00_7;
 	wire [3:0] new_branch_metric_01_7;
 	wire [3:0] new_branch_metric_10_7;
@@ -155,10 +155,10 @@ module viterbi_decoder_top(
 	wire [7:0] updated_selected_branch_at_01_7;
 	wire [7:0] updated_selected_branch_at_10_7;
 	wire [7:0] updated_selected_branch_at_11_7;
-	wire [2:0] write_pointer_out_fifth_acs;
-	wire valid_out_fifth_acs;
+	wire [2:0] write_pointer_out_fifth_cs;
+	wire valid_out_fifth_cs;
 
-//Sixth_acs
+//Sixth_cs
 	wire [3:0] new_branch_metric_00_8;
 	wire [3:0] new_branch_metric_01_8;
 	wire [3:0] new_branch_metric_10_8;
@@ -167,8 +167,8 @@ module viterbi_decoder_top(
 	wire [7:0] updated_selected_branch_at_01_8;
 	wire [7:0] updated_selected_branch_at_10_8;
 	wire [7:0] updated_selected_branch_at_11_8;
-	wire [2:0] write_pointer_out_sixth_acs;
-	wire valid_out_sixth_acs;
+	wire [2:0] write_pointer_out_sixth_cs;
+	wire valid_out_sixth_cs;
 
 //Selector
 	wire [7:0] selected_branch_at_00;
@@ -176,12 +176,12 @@ module viterbi_decoder_top(
 	wire [7:0] selected_branch_at_10;
 	wire [7:0] selected_branch_at_11;
 	wire valid_out_selector;
-	wire renew;
+	wire refresh;
 
 input_buffer input_buffer_inst(
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.data_in(data_in),
 	.bit_pair_0(bit_pair_0),
 	.bit_pair_1(bit_pair_1),
@@ -196,7 +196,7 @@ input_buffer input_buffer_inst(
 first_bmu first_bmu_inst(
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_0(bit_pair_0),
 	.branch_metric_0(branch_metric_0),
 	.branch_metric_1(branch_metric_1),
@@ -206,7 +206,7 @@ first_bmu first_bmu_inst(
 second_bmu second_bmu_inst(
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_1(bit_pair_1),
 	.branch_metric_0(branch_metric_0),
 	.branch_metric_1(branch_metric_1),
@@ -222,7 +222,7 @@ bmu third_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_input(bit_pair_2),
 	.branch_metric_00(branch_metric_00),
 	.branch_metric_01(branch_metric_01),
@@ -241,11 +241,11 @@ bmu third_bmu_inst(
 	.valid_out(valid_out_third_bmu)
 );
 
-first_acs first_acs_inst(
+first_cs first_cs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.branch_metric_00_0(branch_metric_000_3),
 	.branch_metric_00_1(branch_metric_001_3),
 	.branch_metric_01_0(branch_metric_010_3),
@@ -264,21 +264,21 @@ first_acs first_acs_inst(
 	.selected_branch_at_01(selected_branch_at_01_3),
 	.selected_branch_at_10(selected_branch_at_10_3),
 	.selected_branch_at_11(selected_branch_at_11_3),
-	.write_pointer_out(write_pointer_out_first_acs),
-	.valid_out(valid_out_first_acs)
+	.write_pointer_out(write_pointer_out_first_cs),
+	.valid_out(valid_out_first_cs)
 );
 
 bmu fourth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_input(bit_pair_3),
 	.branch_metric_00(new_branch_metric_00_3),
 	.branch_metric_01(new_branch_metric_01_3),
 	.branch_metric_10(new_branch_metric_10_3),
 	.branch_metric_11(new_branch_metric_11_3),
-	.valid_in(valid_out_first_acs),
+	.valid_in(valid_out_first_cs),
 	//Outputs
 	.branch_metric_000(branch_metric_000_4),
 	.branch_metric_001(branch_metric_001_4),
@@ -291,11 +291,11 @@ bmu fourth_bmu_inst(
 	.valid_out(valid_out_fourth_bmu)
 );
 
-acs second_acs_inst(
+cs second_cs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.branch_metric_00_0(branch_metric_000_4),
 	.branch_metric_00_1(branch_metric_001_4),
 	.branch_metric_01_0(branch_metric_010_4),
@@ -309,7 +309,7 @@ acs second_acs_inst(
 	.selected_branch_at_01(selected_branch_at_01_3),
 	.selected_branch_at_10(selected_branch_at_10_3),
 	.selected_branch_at_11(selected_branch_at_11_3),
-	.write_pointer_in(write_pointer_out_first_acs),
+	.write_pointer_in(write_pointer_out_first_cs),
 	//Outputs
 	.new_branch_metric_00(new_branch_metric_00_4),
 	.new_branch_metric_01(new_branch_metric_01_4),
@@ -319,21 +319,21 @@ acs second_acs_inst(
 	.updated_selected_branch_at_01(updated_selected_branch_at_01_4),
 	.updated_selected_branch_at_10(updated_selected_branch_at_10_4),
 	.updated_selected_branch_at_11(updated_selected_branch_at_11_4),
-	.write_pointer_out(write_pointer_out_second_acs),
-	.valid_out(valid_out_second_acs)
+	.write_pointer_out(write_pointer_out_second_cs),
+	.valid_out(valid_out_second_cs)
 );
 
 bmu fifth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_input(bit_pair_4),
 	.branch_metric_00(new_branch_metric_00_4),
 	.branch_metric_01(new_branch_metric_01_4),
 	.branch_metric_10(new_branch_metric_10_4),
 	.branch_metric_11(new_branch_metric_11_4),
-	.valid_in(valid_out_second_acs),
+	.valid_in(valid_out_second_cs),
 	//Outputs
 	.branch_metric_000(branch_metric_000_5),
 	.branch_metric_001(branch_metric_001_5),
@@ -346,11 +346,11 @@ bmu fifth_bmu_inst(
 	.valid_out(valid_out_fifth_bmu)
 );
 
-acs third_acs_inst(
+cs third_cs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.branch_metric_00_0(branch_metric_000_5),
 	.branch_metric_00_1(branch_metric_001_5),
 	.branch_metric_01_0(branch_metric_010_5),
@@ -364,7 +364,7 @@ acs third_acs_inst(
 	.selected_branch_at_01(updated_selected_branch_at_01_4),
 	.selected_branch_at_10(updated_selected_branch_at_10_4),
 	.selected_branch_at_11(updated_selected_branch_at_11_4),
-	.write_pointer_in(write_pointer_out_second_acs),
+	.write_pointer_in(write_pointer_out_second_cs),
 	//Outputs
 	.new_branch_metric_00(new_branch_metric_00_5),
 	.new_branch_metric_01(new_branch_metric_01_5),
@@ -374,21 +374,21 @@ acs third_acs_inst(
 	.updated_selected_branch_at_01(updated_selected_branch_at_01_5),
 	.updated_selected_branch_at_10(updated_selected_branch_at_10_5),
 	.updated_selected_branch_at_11(updated_selected_branch_at_11_5),
-	.write_pointer_out(write_pointer_out_third_acs),
-	.valid_out(valid_out_third_acs)
+	.write_pointer_out(write_pointer_out_third_cs),
+	.valid_out(valid_out_third_cs)
 );
 
 bmu sixth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_input(bit_pair_5),
 	.branch_metric_00(new_branch_metric_00_5),
 	.branch_metric_01(new_branch_metric_01_5),
 	.branch_metric_10(new_branch_metric_10_5),
 	.branch_metric_11(new_branch_metric_11_5),
-	.valid_in(valid_out_third_acs),
+	.valid_in(valid_out_third_cs),
 	//Outputs
 	.branch_metric_000(branch_metric_000_6),
 	.branch_metric_001(branch_metric_001_6),
@@ -401,11 +401,11 @@ bmu sixth_bmu_inst(
 	.valid_out(valid_out_sixth_bmu)
 );
 
-acs fourth_acs_inst(
+cs fourth_cs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.branch_metric_00_0(branch_metric_000_6),
 	.branch_metric_00_1(branch_metric_001_6),
 	.branch_metric_01_0(branch_metric_010_6),
@@ -419,7 +419,7 @@ acs fourth_acs_inst(
 	.selected_branch_at_01(updated_selected_branch_at_01_5),
 	.selected_branch_at_10(updated_selected_branch_at_10_5),
 	.selected_branch_at_11(updated_selected_branch_at_11_5),
-	.write_pointer_in(write_pointer_out_third_acs),
+	.write_pointer_in(write_pointer_out_third_cs),
 	//Outputs
 	.new_branch_metric_00(new_branch_metric_00_6),
 	.new_branch_metric_01(new_branch_metric_01_6),
@@ -429,21 +429,21 @@ acs fourth_acs_inst(
 	.updated_selected_branch_at_01(updated_selected_branch_at_01_6),
 	.updated_selected_branch_at_10(updated_selected_branch_at_10_6),
 	.updated_selected_branch_at_11(updated_selected_branch_at_11_6),
-	.write_pointer_out(write_pointer_out_fourth_acs),
-	.valid_out(valid_out_fourth_acs)
+	.write_pointer_out(write_pointer_out_fourth_cs),
+	.valid_out(valid_out_fourth_cs)
 );
 
 bmu seventh_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_input(bit_pair_6),
 	.branch_metric_00(new_branch_metric_00_6),
 	.branch_metric_01(new_branch_metric_01_6),
 	.branch_metric_10(new_branch_metric_10_6),
 	.branch_metric_11(new_branch_metric_11_6),
-	.valid_in(valid_out_fourth_acs),
+	.valid_in(valid_out_fourth_cs),
 	//Outputs
 	.branch_metric_000(branch_metric_000_7),
 	.branch_metric_001(branch_metric_001_7),
@@ -456,11 +456,11 @@ bmu seventh_bmu_inst(
 	.valid_out(valid_out_seventh_bmu)
 );
 
-acs fifth_acs_inst(
+cs fifth_cs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.branch_metric_00_0(branch_metric_000_7),
 	.branch_metric_00_1(branch_metric_001_7),
 	.branch_metric_01_0(branch_metric_010_7),
@@ -474,7 +474,7 @@ acs fifth_acs_inst(
 	.selected_branch_at_01(updated_selected_branch_at_01_6),
 	.selected_branch_at_10(updated_selected_branch_at_10_6),
 	.selected_branch_at_11(updated_selected_branch_at_11_6),
-	.write_pointer_in(write_pointer_out_fourth_acs),
+	.write_pointer_in(write_pointer_out_fourth_cs),
 	//Outputs
 	.new_branch_metric_00(new_branch_metric_00_7),
 	.new_branch_metric_01(new_branch_metric_01_7),
@@ -484,21 +484,21 @@ acs fifth_acs_inst(
 	.updated_selected_branch_at_01(updated_selected_branch_at_01_7),
 	.updated_selected_branch_at_10(updated_selected_branch_at_10_7),
 	.updated_selected_branch_at_11(updated_selected_branch_at_11_7),
-	.write_pointer_out(write_pointer_out_fifth_acs),
-	.valid_out(valid_out_fifth_acs)
+	.write_pointer_out(write_pointer_out_fifth_cs),
+	.valid_out(valid_out_fifth_cs)
 );
 
 bmu eighth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),
+	.refresh(refresh),
 	.bit_pair_input(bit_pair_7),
 	.branch_metric_00(new_branch_metric_00_7),
 	.branch_metric_01(new_branch_metric_01_7),	
 	.branch_metric_10(new_branch_metric_10_7),
 	.branch_metric_11(new_branch_metric_11_7),
-	.valid_in(valid_out_fifth_acs),
+	.valid_in(valid_out_fifth_cs),
 	//Outputs
 	.branch_metric_000(branch_metric_000_8),
 	.branch_metric_001(branch_metric_001_8),	
@@ -511,11 +511,11 @@ bmu eighth_bmu_inst(
 	.valid_out(valid_out_eighth_bmu)
 );
 
-acs sixth_acs_inst(
+cs sixth_cs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
-	.renew(renew),	
+	.refresh(refresh),	
 	.branch_metric_00_0(branch_metric_000_8),
 	.branch_metric_00_1(branch_metric_001_8),
 	.branch_metric_01_0(branch_metric_010_8),
@@ -529,7 +529,7 @@ acs sixth_acs_inst(
 	.selected_branch_at_01(updated_selected_branch_at_01_7),
 	.selected_branch_at_10(updated_selected_branch_at_10_7),	
 	.selected_branch_at_11(updated_selected_branch_at_11_7),
-	.write_pointer_in(write_pointer_out_fifth_acs),
+	.write_pointer_in(write_pointer_out_fifth_cs),
 	//Outputs
 	.new_branch_metric_00(new_branch_metric_00_8),
 	.new_branch_metric_01(new_branch_metric_01_8),
@@ -539,8 +539,8 @@ acs sixth_acs_inst(
 	.updated_selected_branch_at_01(updated_selected_branch_at_01_8),
 	.updated_selected_branch_at_10(updated_selected_branch_at_10_8),
 	.updated_selected_branch_at_11(updated_selected_branch_at_11_8),
-	.write_pointer_out(write_pointer_out_sixth_acs),
-	.valid_out(valid_out_sixth_acs)
+	.write_pointer_out(write_pointer_out_sixth_cs),
+	.valid_out(valid_out_sixth_cs)
 );
 selector selector_inst(
 	//Inputs
@@ -554,10 +554,10 @@ selector selector_inst(
 	.new_branch_metric_01(new_branch_metric_01_8),
 	.new_branch_metric_10(new_branch_metric_10_8),
 	.new_branch_metric_11(new_branch_metric_11_8),
-	.write_pointer_in(write_pointer_out_sixth_acs),
-	.valid_in(valid_out_sixth_acs),
+	.write_pointer_in(write_pointer_out_sixth_cs),
+	.valid_in(valid_out_sixth_cs),
 	//Outputs	
 	.out(data_out),
-	.renew(renew)
+	.refresh(refresh)
 );
 endmodule

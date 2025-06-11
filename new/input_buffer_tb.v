@@ -2,7 +2,7 @@ module input_buffer_tb;
     // Định nghĩa các tín hiệu test
     reg clk;
     reg rst;
-    reg renew;
+    reg refresh;
     reg [15:0] data_in;
     wire [1:0] bit_pair_0;
     wire [1:0] bit_pair_1;
@@ -17,7 +17,7 @@ module input_buffer_tb;
     input_buffer dut (
         .clk(clk),
         .rst(rst),
-        .renew(renew),
+        .refresh(refresh),
         .data_in(data_in),
         .bit_pair_0(bit_pair_0),
         .bit_pair_1(bit_pair_1),
@@ -43,7 +43,7 @@ module input_buffer_tb;
 
         // Test case 1: Reset
         rst = 1;
-        renew = 0;
+        refresh = 0;
         data_in = 16'h0000;
         #20;
         rst = 0;
@@ -63,9 +63,9 @@ module input_buffer_tb;
         #10;
         
         // Test case 4: Hoàn thành giải mã gói đầu tiên
-        renew = 1;
+        refresh = 1;
         #10;
-        renew = 0;
+        refresh = 0;
         #10;
         // Kiểm tra xem dữ liệu thứ hai có được load không
         if (bit_pair_7 !== 2'b01) $display("Error: bit_pair_7 = %b, expected 01", bit_pair_7);
@@ -93,8 +93,8 @@ module input_buffer_tb;
 
     // Monitor để theo dõi các tín hiệu
     initial begin
-        $monitor("Time=%0t rst=%b renew=%b data_in=%h bit_pairs=%b%b%b%b_%b%b%b%b",
-                 $time, rst, renew, data_in,
+        $monitor("Time=%0t rst=%b refresh=%b data_in=%h bit_pairs=%b%b%b%b_%b%b%b%b",
+                 $time, rst, refresh, data_in,
                  bit_pair_7, bit_pair_6, bit_pair_5, bit_pair_4,
                  bit_pair_3, bit_pair_2, bit_pair_1, bit_pair_0);
     end

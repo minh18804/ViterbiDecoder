@@ -4,7 +4,7 @@
 module input_buffer(
     input wire clk,
     input wire rst,
-    input wire renew,
+    input wire refresh,
     input wire [15:0] data_in,
     output reg [1:0] bit_pair_0,
     output reg [1:0] bit_pair_1,
@@ -48,7 +48,7 @@ always @(posedge clk or posedge rst) begin
         decoding <= 1'b0;
     end
     else begin
-        if (renew) begin
+        if (refresh) begin
             // Khi hoàn thành giải mã một gói
             if (data_reg[1] != 16'b0) begin
                 // Nếu có dữ liệu trong ngăn 1, chuyển sang xử lý

@@ -1,11 +1,11 @@
-`ifndef ACS_V
-`define ACS_V
+`ifndef CS_V
+`define CS_V
 
 // done
-module first_acs(
+module first_cs(
     input wire clk,
     input wire rst,
-    input wire renew,
+    input wire refresh,
     input wire [3:0] branch_metric_00_0,
     input wire [3:0] branch_metric_00_1,
     input wire [3:0] branch_metric_01_0,
@@ -32,7 +32,7 @@ module first_acs(
 );
 
     always @(posedge clk or posedge rst) begin
-        if (rst || renew) begin
+        if (rst || refresh) begin
             new_branch_metric_00 <= 4'b0000;
             new_branch_metric_01 <= 4'b0000;
             new_branch_metric_10 <= 4'b0000;
@@ -100,10 +100,10 @@ module first_acs(
     end
 endmodule
 
-module acs(
+module cs(
     input wire clk,
     input wire rst,
-    input wire renew,
+    input wire refresh,
     input wire [3:0] branch_metric_00_0,
     input wire [3:0] branch_metric_00_1,
     input wire [3:0] branch_metric_01_0,
@@ -134,7 +134,7 @@ module acs(
 );
 
     always @(posedge clk or posedge rst) begin
-        if (rst || renew) begin
+        if (rst || refresh) begin
             write_pointer_out <= 3'd0;
             new_branch_metric_00 <= 4'b0000;
             new_branch_metric_01 <= 4'b0000;
