@@ -176,10 +176,12 @@ module viterbi_decoder_top(
 	wire [7:0] selected_branch_at_10;
 	wire [7:0] selected_branch_at_11;
 	wire valid_out_selector;
+	wire renew;
 
 input_buffer input_buffer_inst(
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.data_in(data_in),
 	.bit_pair_0(bit_pair_0),
 	.bit_pair_1(bit_pair_1),
@@ -194,6 +196,7 @@ input_buffer input_buffer_inst(
 first_bmu first_bmu_inst(
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_0(bit_pair_0),
 	.branch_metric_0(branch_metric_0),
 	.branch_metric_1(branch_metric_1),
@@ -203,6 +206,7 @@ first_bmu first_bmu_inst(
 second_bmu second_bmu_inst(
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_1(bit_pair_1),
 	.branch_metric_0(branch_metric_0),
 	.branch_metric_1(branch_metric_1),
@@ -218,6 +222,7 @@ bmu third_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_input(bit_pair_2),
 	.branch_metric_00(branch_metric_00),
 	.branch_metric_01(branch_metric_01),
@@ -240,6 +245,7 @@ first_acs first_acs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.branch_metric_00_0(branch_metric_000_3),
 	.branch_metric_00_1(branch_metric_001_3),
 	.branch_metric_01_0(branch_metric_010_3),
@@ -266,6 +272,7 @@ bmu fourth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_input(bit_pair_3),
 	.branch_metric_00(new_branch_metric_00_3),
 	.branch_metric_01(new_branch_metric_01_3),
@@ -288,6 +295,7 @@ acs second_acs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.branch_metric_00_0(branch_metric_000_4),
 	.branch_metric_00_1(branch_metric_001_4),
 	.branch_metric_01_0(branch_metric_010_4),
@@ -319,6 +327,7 @@ bmu fifth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_input(bit_pair_4),
 	.branch_metric_00(new_branch_metric_00_4),
 	.branch_metric_01(new_branch_metric_01_4),
@@ -341,6 +350,7 @@ acs third_acs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.branch_metric_00_0(branch_metric_000_5),
 	.branch_metric_00_1(branch_metric_001_5),
 	.branch_metric_01_0(branch_metric_010_5),
@@ -372,6 +382,7 @@ bmu sixth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_input(bit_pair_5),
 	.branch_metric_00(new_branch_metric_00_5),
 	.branch_metric_01(new_branch_metric_01_5),
@@ -394,6 +405,7 @@ acs fourth_acs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.branch_metric_00_0(branch_metric_000_6),
 	.branch_metric_00_1(branch_metric_001_6),
 	.branch_metric_01_0(branch_metric_010_6),
@@ -425,6 +437,7 @@ bmu seventh_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_input(bit_pair_6),
 	.branch_metric_00(new_branch_metric_00_6),
 	.branch_metric_01(new_branch_metric_01_6),
@@ -447,6 +460,7 @@ acs fifth_acs_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.branch_metric_00_0(branch_metric_000_7),
 	.branch_metric_00_1(branch_metric_001_7),
 	.branch_metric_01_0(branch_metric_010_7),
@@ -478,9 +492,10 @@ bmu eighth_bmu_inst(
 	//Inputs
 	.clk(clk),
 	.rst(rst),
+	.renew(renew),
 	.bit_pair_input(bit_pair_7),
 	.branch_metric_00(new_branch_metric_00_7),
-	.branch_metric_01(new_branch_metric_01_7),
+	.branch_metric_01(new_branch_metric_01_7),	
 	.branch_metric_10(new_branch_metric_10_7),
 	.branch_metric_11(new_branch_metric_11_7),
 	.valid_in(valid_out_fifth_acs),
@@ -499,7 +514,8 @@ bmu eighth_bmu_inst(
 acs sixth_acs_inst(
 	//Inputs
 	.clk(clk),
-	.rst(rst),	
+	.rst(rst),
+	.renew(renew),	
 	.branch_metric_00_0(branch_metric_000_8),
 	.branch_metric_00_1(branch_metric_001_8),
 	.branch_metric_01_0(branch_metric_010_8),
@@ -541,6 +557,7 @@ selector selector_inst(
 	.write_pointer_in(write_pointer_out_sixth_acs),
 	.valid_in(valid_out_sixth_acs),
 	//Outputs	
-	.out(data_out)
+	.out(data_out),
+	.renew(renew)
 );
 endmodule

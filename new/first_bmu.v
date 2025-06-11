@@ -5,6 +5,7 @@ module first_bmu(
     input wire [1:0] bit_pair_0, //cặp bit thứ nhất của input, 
     input wire clk,
     input wire rst,
+    input wire renew,
     output reg [1:0] branch_metric_0, //khoảng cách Hamming của bit_pair_0 với 00, chuyển sang trạng thái 00 ứng với đầu ra 0
     output reg [1:0] branch_metric_1, //khoảng cách Hamming của bit_pair_0 với 11, chuyển sang trạng thái 01 ứng với đầu ra 1
     output reg valid_out
@@ -12,7 +13,7 @@ module first_bmu(
     reg [1:0] count;
 
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (rst || renew) begin
             branch_metric_0 <= 2'b00;
             branch_metric_1 <= 2'b00;
             valid_out <= 1'b0;
@@ -52,6 +53,7 @@ module second_bmu(
     input wire [1:0] bit_pair_1,
     input wire clk,
     input wire rst,
+    input wire renew,
     input wire [1:0] branch_metric_0,
     input wire [1:0] branch_metric_1,
     input wire valid_in,
@@ -64,7 +66,7 @@ module second_bmu(
     reg [1:0] count;
 
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (rst || renew) begin
             branch_metric_00 <= 3'b000;
             branch_metric_01 <= 3'b000;
             branch_metric_10 <= 3'b000;
@@ -117,6 +119,7 @@ endmodule
 module bmu(
     input wire clk,
     input wire rst,
+    input wire renew,
     input wire [1:0] bit_pair_input,
     input wire [2:0] branch_metric_00,
     input wire [2:0] branch_metric_01,
@@ -135,8 +138,8 @@ module bmu(
 );
     reg [1:0] count;
 
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
+    always @(posedge clk or posedge rst or renew) begin
+        if (rst || renew) begin
             branch_metric_000 <= 4'b0000;
             branch_metric_001 <= 4'b0000;
             branch_metric_010 <= 4'b0000;

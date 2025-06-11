@@ -5,6 +5,7 @@
 module first_acs(
     input wire clk,
     input wire rst,
+    input wire renew,
     input wire [3:0] branch_metric_00_0,
     input wire [3:0] branch_metric_00_1,
     input wire [3:0] branch_metric_01_0,
@@ -31,7 +32,7 @@ module first_acs(
 );
 
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (rst || renew) begin
             new_branch_metric_00 <= 4'b0000;
             new_branch_metric_01 <= 4'b0000;
             new_branch_metric_10 <= 4'b0000;
@@ -102,6 +103,7 @@ endmodule
 module acs(
     input wire clk,
     input wire rst,
+    input wire renew,
     input wire [3:0] branch_metric_00_0,
     input wire [3:0] branch_metric_00_1,
     input wire [3:0] branch_metric_01_0,
@@ -131,12 +133,9 @@ module acs(
     output reg valid_out
 );
 
-    always @(write_pointer_in) begin    
-        write_pointer_out <= write_pointer_in + 1'b1;
-    end
-
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (rst || renew) begin
+            write_pointer_out <= 3'd0;
             new_branch_metric_00 <= 4'b0000;
             new_branch_metric_01 <= 4'b0000;
             new_branch_metric_10 <= 4'b0000;
@@ -145,60 +144,54 @@ module acs(
             updated_selected_branch_at_01 <= 8'b00000000;
             updated_selected_branch_at_10 <= 8'b00000000;
             updated_selected_branch_at_11 <= 8'b00000000;
-            write_pointer_out <= 3'd0;
             valid_out <= 1'b0;
         end
-        else if (valid_in) 
-        begin
+        else if (valid_in) begin
+            write_pointer_out <= write_pointer_in + 1'b1;
             valid_out <= 1'b1;
 
             //Xử lý trạng thái 00
-            if (branch_metric_00_0 <= branch_metric_10_0) 
-            begin
+            if (branch_metric_00_0 <= branch_metric_10_0) begin
                 new_branch_metric_00 <= branch_metric_00_0;
                 updated_selected_branch_at_00 <= (selected_branch_at_00 ^ (1'b0 << (7'd7 - write_pointer_in)));
             end
-            else 
-            begin
+            else begin
                 new_branch_metric_00 <= branch_metric_10_0;
                 updated_selected_branch_at_00 <= (selected_branch_at_10 ^ (1'b0 << (7'd7 - write_pointer_in)));
             end
 
             //Xử lý trạng thái 01
-            if (branch_metric_00_1 <= branch_metric_10_1) 
-            begin
+            if (branch_metric_00_1 <= branch_metric_10_1) begin
                 new_branch_metric_01 <= branch_metric_00_1;
                 updated_selected_branch_at_01 <= (selected_branch_at_00 ^ (1'b1 << (7'd7 - write_pointer_in)));
             end
-            else 
-            begin
+            else begin
                 new_branch_metric_01 <= branch_metric_10_1;
                 updated_selected_branch_at_01 <= (selected_branch_at_10 ^ (1'b1 << (7'd7 - write_pointer_in)));
             end
 
             //Xử lý trạng thái 10
-            if (branch_metric_01_0 <= branch_metric_11_0) 
-            begin
+            if (branch_metric_01_0 <= branch_metric_11_0) begin
                 new_branch_metric_10 <= branch_metric_01_0;
                 updated_selected_branch_at_10 <= (selected_branch_at_01 ^ (1'b0 << (7'd7 - write_pointer_in)));
             end
-            else 
-            begin
+            else begin
                 new_branch_metric_10 <= branch_metric_11_0;
                 updated_selected_branch_at_10 <= (selected_branch_at_11 ^ (1'b0 << (7'd7 - write_pointer_in)));
             end
 
             //Xử lý trạng thái 11
-            if (branch_metric_01_1 <= branch_metric_11_1) 
-            begin
+            if (branch_metric_01_1 <= branch_metric_11_1) begin
                 new_branch_metric_11 <= branch_metric_01_1;
                 updated_selected_branch_at_11 <= (selected_branch_at_01 ^ (1'b1 << (7'd7 - write_pointer_in)));
             end
-            else 
-            begin
+            else begin
                 new_branch_metric_11 <= branch_metric_11_1;
                 updated_selected_branch_at_11 <= (selected_branch_at_11 ^ (1'b1 << (7'd7 - write_pointer_in)));
             end
+        end
+        else begin
+            valid_out <= 1'b0;
         end
     end
 endmodule

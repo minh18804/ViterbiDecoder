@@ -78,46 +78,29 @@ module viterbi_decoder_tb;
         $display("\nTest Case 2: All ones input");
         send_data(16'hFFFF);
         check_output(8'hFF, 2);
-
-//        // Test Case 3: Alternating bits
-//        $display("\nTest Case 3: Alternating bits");
-//        send_data(16'hAAAA);
-//        check_output(8'hAA, 3);
-
-//        // Test Case 4: Random pattern 1
-//        $display("\nTest Case 4: Random pattern 1");
-//        send_data(16'h5555);
-//        check_output(8'h55, 4);
-
-//        // Test Case 5: Random pattern 2
-//        $display("\nTest Case 5: Random pattern 2");
-//        send_data(16'h1234);
-//        check_output(8'h12, 5);
-
-//        // Test Case 6: Random pattern 3
-//        $display("\nTest Case 6: Random pattern 3");
-//        send_data(16'h9876);
-//        check_output(8'h98, 6);
-
-//        // Test Case 7: Edge pattern 1
-//        $display("\nTest Case 7: Edge pattern 1");
-//        send_data(16'h0F0F);
-//        check_output(8'h0F, 7);
-
-//        // Test Case 8: Edge pattern 2
-//        $display("\nTest Case 8: Edge pattern 2");
-//        send_data(16'hF0F0);
-//        check_output(8'hF0, 8);
-
-        // Add delay to observe final outputs
-        #100;
+        
+        // Test Case 3: Alternating pattern
+        $display("\nTest Case 3: Alternating pattern");
+        send_data(16'hAAAA);
+        check_output(8'hAA, 3);
+        
+        // Test Case 4: Another pattern
+        $display("\nTest Case 4: Another pattern");
+        send_data(16'h5555);
+        check_output(8'h55, 4);
+        
+        // Test Case 5: Random pattern
+        $display("\nTest Case 5: Random pattern");
+        send_data(16'h1234);
+        check_output(8'h12, 5);
 
         // End simulation
-        $display("\nViterbi Decoder Testing Complete!");
+        #100;
+        $display("\nSimulation completed!");
         $finish;
     end
 
-    // Monitor changes
+    // Monitor results
     initial begin
         $monitor("Time=%0t rst=%b data_in=%h data_out=%h",
                  $time, rst, data_in, data_out);
