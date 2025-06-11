@@ -24,7 +24,7 @@ reg has_new_data;             // Đánh dấu có dữ liệu mới
 reg [15:0] prev_data;         // Lưu giá trị data_in trước đó để so sánh với data_in hiện tại
 
 // Kiểm tra dữ liệu vào
-always @(data_in or posedge rst) begin
+always @(posedge clk or posedge rst) begin
     if (rst) begin
         has_new_data <= 1'b0; //Xử lý khi reset
     end
