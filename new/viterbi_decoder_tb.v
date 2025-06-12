@@ -5,6 +5,7 @@ module viterbi_decoder_tb;
     // Testbench signals
     reg clk;
     reg rst;
+    reg refresh;
     reg [15:0] data_in;
     wire [7:0] data_out;
 
@@ -12,6 +13,7 @@ module viterbi_decoder_tb;
     viterbi_decoder_top dut (
         .clk(clk),
         .rst(rst),
+        .refresh(refresh),
         .data_in(data_in),
         .data_out(data_out)
     );
@@ -26,6 +28,7 @@ module viterbi_decoder_tb;
     task reset_system;
         begin
             rst = 1;
+            refresh = 0;
             data_in = 16'h0000;
             #20;
             rst = 0;
@@ -102,8 +105,8 @@ module viterbi_decoder_tb;
 
     // Monitor results
     initial begin
-        $monitor("Time=%0t rst=%b data_in=%h data_out=%h",
-                 $time, rst, data_in, data_out);
+        $monitor("Time=%0t rst=%b refresh=%b data_in=%h data_out=%h",
+                 $time, rst, refresh, data_in, data_out);
     end
 
 endmodule 

@@ -6,6 +6,7 @@ module selector_tb;
     reg clk;
     reg rst;
     reg valid_in;
+    reg refresh;
 
     // Input signals
     reg [7:0] path_00, path_01, path_10, path_11;
@@ -19,6 +20,7 @@ module selector_tb;
     selector dut (
         .clk(clk),
         .rst(rst),
+        .refresh(refresh),
         .updated_selected_branch_at_00(path_00),
         .updated_selected_branch_at_01(path_01),
         .updated_selected_branch_at_10(path_10),
@@ -43,6 +45,7 @@ module selector_tb;
         begin
             rst = 1;
             valid_in = 0;
+            refresh = 0;
             write_pointer = 0;
             {path_00, path_01, path_10, path_11} = {8'h00, 8'h00, 8'h00, 8'h00};
             {metric_00, metric_01, metric_10, metric_11} = {4'h0, 4'h0, 4'h0, 4'h0};
@@ -136,8 +139,8 @@ module selector_tb;
 
     // Monitor results
     initial begin
-        $monitor("Time=%0t rst=%b valid=%b metrics=%h %h %h %h selected=%h",
-            $time, rst, valid_in, 
+        $monitor("Time=%0t rst=%b refresh=%b valid=%b metrics=%h %h %h %h selected=%h",
+            $time, rst, refresh, valid_in, 
             metric_00, metric_01, metric_10, metric_11,
             selected_path);
     end

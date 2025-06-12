@@ -126,72 +126,72 @@ module bmu(
     input wire [2:0] branch_metric_10,
     input wire [2:0] branch_metric_11,
     input wire valid_in,
-    output reg [3:0] branch_metric_000,
-    output reg [3:0] branch_metric_001,
-    output reg [3:0] branch_metric_010,
-    output reg [3:0] branch_metric_011,
-    output reg [3:0] branch_metric_100,
-    output reg [3:0] branch_metric_101,
-    output reg [3:0] branch_metric_110,
-    output reg [3:0] branch_metric_111,
+    output reg [3:0] branch_metric_00_0,
+    output reg [3:0] branch_metric_00_1,
+    output reg [3:0] branch_metric_01_0,
+    output reg [3:0] branch_metric_01_1,
+    output reg [3:0] branch_metric_10_0,
+    output reg [3:0] branch_metric_10_1,
+    output reg [3:0] branch_metric_11_0,
+    output reg [3:0] branch_metric_11_1,
     output reg valid_out
 );
     reg [1:0] count;
 
     always @(posedge clk or posedge rst) begin
         if (rst || refresh) begin
-            branch_metric_000 <= 4'b0000;
-            branch_metric_001 <= 4'b0000;
-            branch_metric_010 <= 4'b0000;
-            branch_metric_011 <= 4'b0000;
-            branch_metric_100 <= 4'b0000;
-            branch_metric_101 <= 4'b0000;
-            branch_metric_110 <= 4'b0000;
-            branch_metric_111 <= 4'b0000;
+            branch_metric_00_0 <= 4'b0000;
+            branch_metric_00_1 <= 4'b0000;
+            branch_metric_01_0 <= 4'b0000;
+            branch_metric_01_1 <= 4'b0000;
+            branch_metric_10_0 <= 4'b0000;
+            branch_metric_10_1 <= 4'b0000;
+            branch_metric_11_0 <= 4'b0000;
+            branch_metric_11_1 <= 4'b0000;
             valid_out <= 1'b0;
             count <= 2'd0;
         end
         else if (valid_in) begin
             case ({bit_pair_input[1], bit_pair_input[0]})
                 2'b00: begin
-                    branch_metric_000 <= 4'd0 + branch_metric_00;
-                    branch_metric_001 <= 4'd2 + branch_metric_00;
-                    branch_metric_010 <= 4'd1 + branch_metric_01;
-                    branch_metric_011 <= 4'd1 + branch_metric_01;
-                    branch_metric_100 <= 4'd2 + branch_metric_10;
-                    branch_metric_101 <= 4'd0 + branch_metric_10;
-                    branch_metric_110 <= 4'd1 + branch_metric_11;
-                    branch_metric_111 <= 4'd1 + branch_metric_11;
+                    branch_metric_00_0 <= 4'd0 + branch_metric_00;
+                    branch_metric_00_1 <= 4'd2 + branch_metric_00;
+                    branch_metric_01_0 <= 4'd1 + branch_metric_01;
+                    branch_metric_01_1 <= 4'd1 + branch_metric_01;
+                    branch_metric_10_0 <= 4'd2 + branch_metric_10;
+                    branch_metric_10_1 <= 4'd0 + branch_metric_10;
+                    branch_metric_11_0 <= 4'd1 + branch_metric_11;
+                    branch_metric_11_1 <= 4'd1 + branch_metric_11;
                 end
                 2'b01: begin
-                    branch_metric_000 <= 4'd1 + branch_metric_00;
-                    branch_metric_001 <= 4'd1 + branch_metric_00;
-                    branch_metric_010 <= 4'd2 + branch_metric_01;
-                    branch_metric_011 <= 4'd0 + branch_metric_01;
-                    branch_metric_100 <= 4'd1 + branch_metric_10;
-                    branch_metric_101 <= 4'd1 + branch_metric_10;
-                    branch_metric_110 <= 4'd0 + branch_metric_11;
-                    branch_metric_111 <= 4'd2 + branch_metric_11;
+                    branch_metric_00_0 <= 4'd1 + branch_metric_00;
+                    branch_metric_00_1 <= 4'd1 + branch_metric_00;
+                    branch_metric_01_0 <= 4'd2 + branch_metric_01;
+                    branch_metric_01_1 <= 4'd0 + branch_metric_01;
+                    branch_metric_10_0 <= 4'd1 + branch_metric_10;
+                    branch_metric_10_1 <= 4'd1 + branch_metric_10;
+                    branch_metric_11_0 <= 4'd0 + branch_metric_11;
+                    branch_metric_11_1 <= 4'd2 + branch_metric_11;
                 end
                 2'b10: begin
-                    branch_metric_000 <= 4'd1 + branch_metric_00;
-                    branch_metric_001 <= 4'd1 + branch_metric_00;
-                    branch_metric_010 <= 4'd0 + branch_metric_01;
-                    branch_metric_011 <= 4'd2 + branch_metric_01;
-                    branch_metric_100 <= 4'd1 + branch_metric_10;
-                    branch_metric_101 <= 4'd1 + branch_metric_10;
-                    branch_metric_110 <= 4'd2 + branch_metric_11;
-                    branch_metric_111 <= 4'd0 + branch_metric_11;
+                    branch_metric_00_0 <= 4'd1 + branch_metric_00;
+                    branch_metric_00_1 <= 4'd1 + branch_metric_00;
+                    branch_metric_01_0 <= 4'd0 + branch_metric_01;
+                    branch_metric_01_1 <= 4'd2 + branch_metric_01;
+                    branch_metric_10_0 <= 4'd1 + branch_metric_10;
+                    branch_metric_10_1 <= 4'd1 + branch_metric_10;
+                    branch_metric_11_0 <= 4'd2 + branch_metric_11;
+                    branch_metric_11_1 <= 4'd0 + branch_metric_11;
                 end
                 2'b11: begin
-                    branch_metric_000 <= 4'd2 + branch_metric_00;
-                    branch_metric_001 <= 4'd0 + branch_metric_00;
-                    branch_metric_010 <= 4'd1 + branch_metric_01;
-                    branch_metric_011 <= 4'd1 + branch_metric_01;
-                    branch_metric_100 <= 4'd0 + branch_metric_10;
-                    branch_metric_101 <= 4'd2 + branch_metric_10;
-                    branch_metric_110 <= 4'd1 + branch_metric_11;
-                    branch_metric_111 <= 4'd1 + branch_metric_11;
+                    branch_metric_00_0 <= 4'd2 + branch_metric_00;
+                    branch_metric_00_1 <= 4'd0 + branch_metric_00;
+                    branch_metric_01_0 <= 4'd1 + branch_metric_01;
+                    branch_metric_01_1 <= 4'd1 + branch_metric_01;
+                    branch_metric_10_0 <= 4'd0 + branch_metric_10;
+                    branch_metric_10_1 <= 4'd2 + branch_metric_10;
+                    branch_metric_11_0 <= 4'd1 + branch_metric_11;
+                    branch_metric_11_1 <= 4'd1 + branch_metric_11;
                 end
             endcase
 
