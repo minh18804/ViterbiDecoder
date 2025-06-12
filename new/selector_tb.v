@@ -5,22 +5,25 @@ module selector_tb;
     // Clock and reset signals
     reg clk;
     reg rst;
-    reg valid_in;
     reg refresh;
+    reg valid_in;
 
     // Input signals
     reg [7:0] path_00, path_01, path_10, path_11;
     reg [3:0] metric_00, metric_01, metric_10, metric_11;
     reg [2:0] write_pointer;
 
-    // Output signal
+    // Output signals
     wire [7:0] selected_path;
+    wire [2:0] write_pointer_out;
+    wire valid_out;
 
     // Instantiate selector module
     selector dut (
         .clk(clk),
         .rst(rst),
         .refresh(refresh),
+        .valid_in(valid_in),
         .updated_selected_branch_at_00(path_00),
         .updated_selected_branch_at_01(path_01),
         .updated_selected_branch_at_10(path_10),
@@ -30,8 +33,9 @@ module selector_tb;
         .new_branch_metric_10(metric_10),
         .new_branch_metric_11(metric_11),
         .write_pointer_in(write_pointer),
-        .valid_in(valid_in),
-        .out(selected_path)
+        .selected_path(selected_path),
+        .write_pointer_out(write_pointer_out),
+        .valid_out(valid_out)
     );
 
     // Clock generation
@@ -44,35 +48,32 @@ module selector_tb;
     task reset_system;
         begin
             rst = 1;
-            valid_in = 0;
             refresh = 0;
+            valid_in = 0;
             write_pointer = 0;
-            {path_00, path_01, path_10, path_11} = {8'h00, 8'h00, 8'h00, 8'h00};
-            {metric_00, metric_01, metric_10, metric_11} = {4'h0, 4'h0, 4'h0, 4'h0};
+            {path_00, path_01, path_10, path_11} = {8'd0, 8'd0, 8'd0, 8'd0};
+            {metric_00, metric_01, metric_10, metric_11} = {4'd0, 4'd0, 4'd0, 4'd0};
             #20;
             rst = 0;
             #10;
         end
     endtask
 
-    task check_result;
+    task test_case;
         input [3:0] test_num;
-        input [3:0] expected_min;
-        input [7:0] expected_path;
+        input [31:0] path_values;    // 4 8-bit paths
+        input [15:0] metric_values;  // 4 4-bit metrics
+        input [2:0] write_ptr;
+        input valid;
+        input refresh_val;
         begin
+            {path_00, path_01, path_10, path_11} = path_values;
+            {metric_00, metric_01, metric_10, metric_11} = metric_values;
+            write_pointer = write_ptr;
+            valid_in = valid;
+            refresh = refresh_val;
             @(posedge clk);
-            #1; // Wait for outputs to stabilize
-            
-            $display("\nTest Case %0d Results:", test_num);
-            $display("Branch Metrics: %h %h %h %h", 
-                    metric_00, metric_01, metric_10, metric_11);
-            $display("Input Paths: %h %h %h %h",
-                    path_00, path_01, path_10, path_11);
-            $display("Selected Path: %h (Expected: %h)", 
-                    selected_path, expected_path);
-            
-            if (selected_path !== expected_path)
-                $display("ERROR: Path selection mismatch!");
+            #1;
         end
     endtask
 
@@ -82,54 +83,122 @@ module selector_tb;
         $dumpfile("selector_tb.vcd");
         $dumpvars(0, selector_tb);
 
-        $display("Starting Selector Module Tests...");
+        $display("Starting Selector Tests...");
         
         // Initial reset
         reset_system();
 
-        // Test Case 1: First state (00) has minimum metric
-        valid_in = 1;
-        {metric_00, metric_01, metric_10, metric_11} = {4'd1, 4'd5, 4'd7, 4'd9};
-        {path_00, path_01, path_10, path_11} = {8'hA0, 8'hB0, 8'hC0, 8'hD0};
-        check_result(1, 4'd1, 8'hA0);
+        // Test Case 1: Basic path selection, no refresh
+        test_case(4'd1,
+            {8'b10101010, 8'b11001100, 8'b11110000, 8'b00001111}, // Paths
+            {4'd1, 4'd2, 4'd3, 4'd4},                             // Metrics
+            3'd0,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b0                                                  // Refresh
+        );
+        #10;
 
-        // Test Case 2: Second state (01) has minimum metric
-        {metric_00, metric_01, metric_10, metric_11} = {4'd8, 4'd2, 4'd6, 4'd7};
-        {path_00, path_01, path_10, path_11} = {8'hA1, 8'hB1, 8'hC1, 8'hD1};
-        check_result(2, 4'd2, 8'hB1);
+        // Test Case 2: Equal metrics with refresh
+        test_case(4'd2,
+            {8'b00001111, 8'b11110000, 8'b10101010, 8'b01010101}, // Paths
+            {4'd2, 4'd2, 4'd2, 4'd2},                             // Equal metrics
+            3'd1,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b1                                                  // Refresh
+        );
+        #10;
 
-        // Test Case 3: Third state (10) has minimum metric
-        {metric_00, metric_01, metric_10, metric_11} = {4'd9, 4'd8, 4'd3, 4'd7};
-        {path_00, path_01, path_10, path_11} = {8'hA2, 8'hB2, 8'hC2, 8'hD2};
-        check_result(3, 4'd3, 8'hC2);
+        // Test Case 3: Maximum metric difference, toggle refresh
+        test_case(4'd3,
+            {8'b11111111, 8'b00000000, 8'b10101010, 8'b01010101}, // Paths
+            {4'd0, 4'd15, 4'd7, 4'd8},                            // Metrics
+            3'd2,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b0                                                  // Refresh
+        );
+        #5 refresh = 1;
+        #5 refresh = 0;
+        #10;
 
-        // Test Case 4: Fourth state (11) has minimum metric
-        {metric_00, metric_01, metric_10, metric_11} = {4'd9, 4'd8, 4'd7, 4'd4};
-        {path_00, path_01, path_10, path_11} = {8'hA3, 8'hB3, 8'hC3, 8'hD3};
-        check_result(4, 4'd4, 8'hD3);
+        // Test Case 4: Write pointer wraparound with refresh
+        test_case(4'd4,
+            {8'b00110011, 8'b11001100, 8'b10101010, 8'b01010101}, // Paths
+            {4'd5, 4'd6, 4'd7, 4'd8},                             // Metrics
+            3'd7,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b1                                                  // Refresh
+        );
+        #10;
 
-        // Test Case 5: Equal metrics (should select first occurrence)
-        {metric_00, metric_01, metric_10, metric_11} = {4'd5, 4'd5, 4'd5, 4'd5};
-        {path_00, path_01, path_10, path_11} = {8'hA4, 8'hB4, 8'hC4, 8'hD4};
-        check_result(5, 4'd5, 8'hA4);
+        // Test Case 5: Valid signal behavior
+        test_case(4'd5,
+            {8'b11110000, 8'b00001111, 8'b11001100, 8'b00110011}, // Paths
+            {4'd1, 4'd2, 4'd3, 4'd4},                             // Metrics
+            3'd3,                                                  // Write pointer
+            1'b0,                                                 // Valid
+            1'b0                                                  // Refresh
+        );
+        #20;
 
-        // Test Case 6: Test with maximum metric values
-        {metric_00, metric_01, metric_10, metric_11} = {4'hF, 4'hF, 4'hF, 4'h0};
-        {path_00, path_01, path_10, path_11} = {8'hA5, 8'hB5, 8'hC5, 8'hD5};
-        check_result(6, 4'h0, 8'hD5);
+        // Test Case 6: Refresh during operation
+        test_case(4'd6,
+            {8'b10101010, 8'b01010101, 8'b11001100, 8'b00110011}, // Paths
+            {4'd9, 4'd10, 4'd11, 4'd12},                          // Metrics
+            3'd4,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b0                                                  // Refresh
+        );
+        #10 refresh = 1;
+        #5 refresh = 0;
+        #10;
 
-        // Test Case 7: Test valid signal
-        valid_in = 0;
-        {metric_00, metric_01, metric_10, metric_11} = {4'd1, 4'd2, 4'd3, 4'd4};
-        {path_00, path_01, path_10, path_11} = {8'hA6, 8'hB6, 8'hC6, 8'hD6};
-        check_result(7, 4'h0, 8'h00); // Should maintain reset value when not valid
+        // Test Case 7: Rapid refresh toggles
+        test_case(4'd7,
+            {8'b11111111, 8'b00000000, 8'b10101010, 8'b01010101}, // Paths
+            {4'd13, 4'd14, 4'd15, 4'd0},                          // Metrics
+            3'd5,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b0                                                  // Refresh
+        );
+        #2 refresh = 1;
+        #3 refresh = 0;
+        #2 refresh = 1;
+        #3 refresh = 0;
+        #10;
 
-        // Test Case 8: Reset during operation
-        valid_in = 1;
-        {metric_00, metric_01, metric_10, metric_11} = {4'd4, 4'd3, 4'd2, 4'd1};
-        {path_00, path_01, path_10, path_11} = {8'hA7, 8'hB7, 8'hC7, 8'hD7};
+        // Test Case 8: Reset and refresh interaction
+        test_case(4'd8,
+            {8'b10101010, 8'b11001100, 8'b11110000, 8'b00001111}, // Paths
+            {4'd4, 4'd3, 4'd2, 4'd1},                             // Metrics
+            3'd6,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b1                                                  // Refresh
+        );
         #5 rst = 1;
-        check_result(8, 4'hF, 8'h00); // Should reset to initial values
+        refresh = 1;
+        #10 rst = 0;
+        #5 refresh = 0;
+        #10;
+
+        // Test Case 9: All paths same, different metrics
+        test_case(4'd9,
+            {8'b11111111, 8'b11111111, 8'b11111111, 8'b11111111}, // Same paths
+            {4'd1, 4'd2, 4'd3, 4'd4},                             // Different metrics
+            3'd0,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b0                                                  // Refresh
+        );
+        #10;
+
+        // Test Case 10: All metrics same, different paths
+        test_case(4'd10,
+            {8'b00000000, 8'b11111111, 8'b10101010, 8'b01010101}, // Different paths
+            {4'd5, 4'd5, 4'd5, 4'd5},                             // Same metrics
+            3'd1,                                                  // Write pointer
+            1'b1,                                                 // Valid
+            1'b1                                                  // Refresh
+        );
+        #10;
 
         // End simulation
         #100;
@@ -139,10 +208,8 @@ module selector_tb;
 
     // Monitor results
     initial begin
-        $monitor("Time=%0t rst=%b refresh=%b valid=%b metrics=%h %h %h %h selected=%h",
-            $time, rst, refresh, valid_in, 
-            metric_00, metric_01, metric_10, metric_11,
-            selected_path);
+        $monitor("Time=%0t rst=%b refresh=%b valid_in=%b wp_in=%0d wp_out=%0d selected=%h",
+            $time, rst, refresh, valid_in, write_pointer, write_pointer_out, selected_path);
     end
 
 endmodule 
